@@ -16,8 +16,7 @@ try:
 except getopt.GetoptError:
     pass
 
-tstream = lexer.lex("""\
-
+tstream = lexer.screen(lexer.lex("""\
 trait Furry <F>
     def furriness -> F
 
@@ -30,7 +29,7 @@ class Cat (var _name = "Kitty") extends Animal with Furry<int>
 
     // Class methods have an implicit self pointer
     // Secondary constructor
-    init def string _name, boo
+    init def str _name, boo
         init(_name)
         print(_name, boo)
 
@@ -47,7 +46,7 @@ class Cat (var _name = "Kitty") extends Animal with Furry<int>
 // Static methods and variables
 var Cat.baz = "Foo"
 
-def Cat.foo string bar
+def Cat.foo str bar
     print (bar)
 
 // accessors
@@ -60,6 +59,9 @@ get var foo
 set var foo v
     // code here
 
-""")
-print(tstream)
+"""))
+
+for token in tstream:
+    print(str(token).replace("\n", "\\n"))
+
 

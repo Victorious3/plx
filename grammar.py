@@ -1,6 +1,9 @@
 from re import compile as regex
 from collections import OrderedDict
 
+class ParseException(Exception):
+    pass
+
 indent = [0]
 
 def init():
@@ -18,8 +21,9 @@ def parse_comment(inp):
     offset = 0
     pattern = regex(r'(\/\*)|(\*\/)')
     while True:
-        match = pattern.search(inp[offset:])
-        if match is None: break
+        match = pattern.search(inp, offset)
+        if match is None:
+            raise ParseException("Hit end of file while parsing comment")
         if match.group(1):
             stack += 1
         else:
@@ -28,6 +32,7 @@ def parse_comment(inp):
         if stack == 0: break
     return "T_MCOMMENT", offset
 
+# TODO Doc comment?
 
 def parse_indent(inp):
     global indent
@@ -67,7 +72,7 @@ tokens = OrderedDict([
     (regex(r'\/\/.*(?=\n|$)'), "T_COMMENT"),
 
     ("/*", parse_comment),
-    ("*/", Exception("Unexpected symbol")),
+    ("*/", ParseException("Unexpected symbol")),
 
     ("{", "T_OPEN_BRACKETS"),
     ("}", "T_CLOSE_BRACKETS"),
@@ -110,6 +115,8 @@ tokens = OrderedDict([
     (kw("case"), "T_KEY_CASE"),
     (kw("type"), "T_KEY_TYPE"),
     (kw("true"), "T_TRUE"),
+    (kw("delete"), "T_DELETE"),
+    (kw("new"), "T_NEW"),
 
     (kw("false"), "T_FALSE"),
     (kw("null"), "T_NULL"),
